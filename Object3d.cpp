@@ -6,7 +6,7 @@
 #include<string>
 #include<vector>
 using namespace std;
-
+//02_01p9
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
@@ -401,7 +401,7 @@ void Object3d::CreateModel()
 	//ファイルストリーム
 	std::ifstream file;
 	//.objファイルへを開く
-	file.open("Resources/triangle/triangle.obj");
+	file.open("Resources/triangle_tex/triangle_tex.obj");
 	//ファイルオープン失敗をチェック
 	if (file.fail()) {
 		assert(0);
@@ -429,10 +429,31 @@ void Object3d::CreateModel()
 			//座標データに追加
 			positions.emplace_back(position);
 			//頂点データに追加
-			VertexPosNormalUv vertex{};
-			vertex.pos = position;
-			vertices.emplace_back(vertex);
 		}
+
+		//先頭文字列がvtならテクスチャ
+		if (key == "vt") {
+			//U,V成分読み込み
+			XMFLOAT2 texcoord{};
+			line_stream >> texcoord.x;
+			line_stream >> texcoord.y;
+			//V方向反転
+			texcoord.y = 1.0f - texcoord.y;
+			//テクスチャ座標データに追加
+			texcoords.emplace_back(texcoord);
+		}
+
+		//先頭文字列がvnならテクスチャ
+		if (key == "vn") {
+			//X,Y,Z成分読み込み
+			XMFLOAT3 normal{};
+			line_stream >> normal.x;
+			line_stream >> normal.y;
+			line_stream >> normal.z;
+			//法線ベクトルデータに追加
+			normals.emplace_back(normal);
+		}
+
 		//先頭文字列がfならポリゴン(三角形)
 		if (key == "f")
 		{
@@ -442,10 +463,20 @@ void Object3d::CreateModel()
 
 				//頂点インデックス1個分の文字列をストリームに変換して解析しやすくする
 				std::istringstream index_stream(index_string);
-				unsigned short indexPosition;
+				unsigned short indexPosition, indexNormal, indexTexcoord;
 				index_stream >> indexPosition;
-				//頂点インデックスに追加
-				indices.emplace_back(indexPosition - 1);
+				index_stream.seekg(1,ios_base::cur);//スラッシュを飛ばす
+				index_stream >> indexTexcoord;
+				index_stream.seekg(1, ios_base::cur);//スラッシュを飛ばす
+				index_stream >> indexNormal;
+				//頂点データの追加
+				VertexPosNormalUv vertex{};
+				vertex.pos = positions[indexPosition - 1];
+				vertex.normal = normals[indexNormal - 1];
+				vertex.uv = texcoords[indexTexcoord - 1];
+				vertices.emplace_back(vertex);
+				//インデックスデータに追加
+				indices.emplace_back((unsigned short)indices.size());
 			}
 		}
 
