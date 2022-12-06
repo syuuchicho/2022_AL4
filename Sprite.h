@@ -167,7 +167,7 @@ private: // メンバ変数
 	// 頂点バッファ
 	ComPtr<ID3D12Resource> vertBuff;
 	// 定数バッファ
-	ComPtr<ID3D12Resource> constBuff;
+	ComPtr<ID3D12Resource> constBuffB0;
 	// 頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
 	// テクスチャ番号

@@ -359,16 +359,16 @@ bool Sprite::Initialize()
 	// 定数バッファの生成
 	result = device->CreateCommittedResource(
 		&heapPropsConstantBuffer, D3D12_HEAP_FLAG_NONE, &resourceDescConstantBuffer, D3D12_RESOURCE_STATE_GENERIC_READ,
-		nullptr, IID_PPV_ARGS(&constBuff));
+		nullptr, IID_PPV_ARGS(&constBuffB0));
 	assert(SUCCEEDED(result));
 
 	// 定数バッファにデータ転送
 	ConstBufferData* constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	result = constBuffB0->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result)) {
 		constMap->color = color;
 		constMap->mat = matProjection;
-		constBuff->Unmap(0, nullptr);
+		constBuffB0->Unmap(0, nullptr);
 	}
 
 	return true;
@@ -440,11 +440,11 @@ void Sprite::Draw()
 
 	// 定数バッファにデータ転送
 	ConstBufferData* constMap = nullptr;
-	HRESULT result = this->constBuff->Map(0, nullptr, (void**)&constMap);
+	HRESULT result = this->constBuffB0->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result)) {
 		constMap->color = this->color;
 		constMap->mat = this->matWorld * matProjection;	// 行列の合成	
-		this->constBuff->Unmap(0, nullptr);
+		this->constBuffB0->Unmap(0, nullptr);
 	}
 
 	// 頂点バッファの設定
@@ -454,7 +454,7 @@ void Sprite::Draw()
 	// デスクリプタヒープをセット
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, this->constBuff->GetGPUVirtualAddress());
+	cmdList->SetGraphicsRootConstantBufferView(0, this->constBuffB0->GetGPUVirtualAddress());
 	// シェーダリソースビューをセット
 	cmdList->SetGraphicsRootDescriptorTable(1, CD3DX12_GPU_DESCRIPTOR_HANDLE(descHeap->GetGPUDescriptorHandleForHeapStart(), this->texNumber, descriptorHandleIncrementSize));
 	// 描画コマンド
