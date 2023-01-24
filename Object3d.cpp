@@ -6,7 +6,7 @@
 #include<string>
 #include<vector>
 using namespace std;
-//02_02エラー　->ビデオ
+
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
@@ -411,7 +411,7 @@ void Object3d::CreateModel()
 	//.objファイルへを開く
 	//file.open("Resources/triangle_tex/triangle_tex.obj");
 
-	const string modelname = "triangle_mat";
+	const string modelname = "shooter";
 	const string filename = modelname + ".obj";		//"triangle_mat.obj/"
 	const string directoryPath = "Resources/" + modelname + "/";	//"Resources/triangle_mat/"
 	file.open(directoryPath + filename);	//"Resources/triangle_mat/triangle_mat.obj"
