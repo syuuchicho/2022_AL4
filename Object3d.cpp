@@ -411,7 +411,7 @@ void Object3d::CreateModel()
 	//.objファイルへを開く
 	//file.open("Resources/triangle_tex/triangle_tex.obj");
 
-	const string modelname = "laminate_floor_02_4k.blend";
+	const string modelname = "shooter";
 	const string filename = modelname + ".obj";		//"triangle_mat.obj/"
 	const string directoryPath = "Resources/" + modelname + "/";	//"Resources/triangle_mat/"
 	file.open(directoryPath + filename);	//"Resources/triangle_mat/triangle_mat.obj"
@@ -686,7 +686,7 @@ void Object3d::Update()
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
-	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
+	matTrans = XMMatrixTranslation(position.x, position.y, position.z+100);
 
 	// ワールド行列の合成
 	matWorld = XMMatrixIdentity(); // 変形をリセット
