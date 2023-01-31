@@ -411,7 +411,7 @@ void Object3d::CreateModel()
 	//.objファイルへを開く
 	//file.open("Resources/triangle_tex/triangle_tex.obj");
 
-	const string modelname = "triangle_mat";
+	const string modelname = "laminate_floor_02_4k.blend";
 	const string filename = modelname + ".obj";		//"triangle_mat.obj/"
 	const string directoryPath = "Resources/" + modelname + "/";	//"Resources/triangle_mat/"
 	file.open(directoryPath + filename);	//"Resources/triangle_mat/triangle_mat.obj"
