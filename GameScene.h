@@ -4,6 +4,7 @@
 #include <DirectXMath.h>
 #include "Input.h"
 #include "Sprite.h"
+#include"Model.h"
 #include "Object3d.h"
 #include "DebugText.h"
 
@@ -62,6 +63,7 @@ private: // メンバ変数
 	/// ゲームシーン用
 	/// </summary>
 	Sprite* spriteBG = nullptr;
+	Model* model = nullptr;
 	Object3d* object3d = nullptr;
 };
 

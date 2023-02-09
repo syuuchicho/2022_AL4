@@ -37,7 +37,8 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	// 背景スプライト生成
 	spriteBG = Sprite::Create(1, { 0.0f,0.0f });
 	// 3Dオブジェクト生成
-	object3d = Object3d::Create();
+	model = Model::StaticCreateFromOBJ("B");
+	object3d = Object3d::Create(model);
 	object3d->Update();
 	//座標{0,0}に,テクスチャ2番のスプライトを生成
 	sprite1 = Sprite::Create(2, { 0,0 });

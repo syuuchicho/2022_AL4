@@ -1,23 +1,71 @@
 #include "Model.h"
 
-
+#include<DirectXTex.h>
 #include<fstream>
 #include<sstream>
-#include<string>
-#include<vector>
 
 using namespace std;
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-void Model::CreateModel()
+
+void Model::StaticInitialize(ID3D12Device* _device)
+{
+	Model::device = _device;
+}
+
+Model* Model::StaticCreateFromOBJ(std::string filePath)
+{
+	//メモリ確保
+	Model* instance = new Model;
+	instance->Initialize(filePath);
+	return instance;
+}
+
+void Model::InitializeDescriptorHeap()
+{
+	// nullptrチェック
+	assert(device);
+	HRESULT result;
+	// ヒーププロパティB0
+	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	// リソース設定
+	CD3DX12_RESOURCE_DESC resourceDesc =
+		CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB0) + 0xff) & ~0xff);
+
+
+	// 定数バッファの生成
+	result = device->CreateCommittedResource(
+		&heapProps, // アップロード可能
+		D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+		IID_PPV_ARGS(&constBuffB0));
+	assert(SUCCEEDED(result));
+
+	// ヒーププロパティB1
+	//CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	// リソース設定
+	resourceDesc =
+		CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff);
+
+
+	// 定数バッファの生成
+	result = device->CreateCommittedResource(
+		&heapProps, // アップロード可能
+		D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr,
+		IID_PPV_ARGS(&constBuffB1));
+	assert(SUCCEEDED(result));
+
+
+}
+
+void Model::LoadModel(std::string filepath)
 {
 	//ファイルストリーム
 	std::ifstream file;
 	//.objファイルへを開く
 	//file.open("Resources/triangle_tex/triangle_tex.obj");
 
-	const string modelname = "shooter";
+	const string modelname = filepath;
 	const string filename = modelname + ".obj";		//"triangle_mat.obj/"
 	const string directoryPath = "Resources/" + modelname + "/";	//"Resources/triangle_mat/"
 	file.open(directoryPath + filename);	//"Resources/triangle_mat/triangle_mat.obj"
@@ -168,4 +216,39 @@ void Model::CreateModel()
 	ibView.Format = DXGI_FORMAT_R16_UINT;
 	//ibView.SizeInBytes = sizeof(indices);
 	ibView.SizeInBytes = sizeIB;
+}
+void Model::Initialize(std::string filepath)
+{
+	//デスクリプタヒープの初期化
+	InitializeDescriptorHeap();
+
+	//モデル読み込み
+	LoadModel(filepath);
+}
+
+void Model::Draw(ID3D12GraphicsCommandList* cmdList)
+{
+	// nullptrチェック
+	assert(device);
+	assert(Object3d::cmdList);
+
+	// 頂点バッファの設定
+	cmdList->IASetVertexBuffers(0, 1, &vbView);
+	// インデックスバッファの設定
+	cmdList->IASetIndexBuffer(&ibView);
+
+	// デスクリプタヒープの配列
+	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
+	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+	
+	if (material.textureFilename.size() > 0)
+	{
+		// シェーダリソースビューをセット
+		cmdList->SetGraphicsRootDescriptorTable(2, gpuDescHandleSRV);
+	}
+	// 描画コマンド
+	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
+
+
 }
