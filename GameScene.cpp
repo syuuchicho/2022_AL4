@@ -1,4 +1,7 @@
 ﻿#include "GameScene.h"
+#include"Collision.h"
+#include<sstream>
+#include<iomanip>
 #include <cassert>
 
 using namespace DirectX;
@@ -42,8 +45,13 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	//座標{0,0}に,テクスチャ2番のスプライトを生成
 	sprite1 = Sprite::Create(2, { 0,0 });
 	//座標{500,500}に,テクスチャ2番のスプライトを生成
-	sprite2 = Sprite::Create(2, {500,500 },{1,0,0,1},{0,0},false,true);
-
+	sprite2 = Sprite::Create(2, { 500,500 }, { 1,0,0,1 }, { 0,0 }, false, true);
+	//球の初期値を設定
+	sphere.center = XMVectorSet(0, 2, 0, 1);//中心点座標
+	sphere.radius = 1.0f;//半径
+	//平面の初期値を設定
+	sphere.center = XMVectorSet(0, 1, 0, 0);//法線ベクトル
+	sphere.radius = 0.0f;//原点(0,0,0)からの距離
 }
 
 void GameScene::Update()
@@ -85,6 +93,48 @@ void GameScene::Update()
 	}
 
 	object3d->Update();
+
+	//球移動
+	{
+		XMVECTOR moveY = XMVectorSet(0, 0.01f, 0, 0);
+		if (input->PushKey(DIK_NUMPAD8)) { sphere.center += moveY; }
+		else if (input->PushKey(DIK_NUMPAD2)) { sphere.center -= moveY; }
+
+		XMVECTOR moveX = XMVectorSet(0.01f, 0, 0, 0);
+		if (input->PushKey(DIK_NUMPAD6)) { sphere.center += moveX; }
+		else if (input->PushKey(DIK_NUMPAD4)) { sphere.center -= moveX; }
+	}
+	//stringstreamで変数の値を埋め込んで整形する
+	std::ostringstream spherestr;
+	spherestr << "Sphere:("
+		<< std::fixed << std::setprecision(2)		//小数点以下2桁まで
+		<< sphere.center.m128_f32[0] << ","		//X
+		<< sphere.center.m128_f32[0] << ","		//Y
+		<< sphere.center.m128_f32[0] << ",";		//Z
+
+	debugText.Print(spherestr.str(), 50, 180, 1.0f);
+
+	//球と平面の当たり判定
+	bool hit = Collision::CheckSphere2Plane(sphere, plane);
+	if (hit){
+		debugText.Print("HIT", 50, 200, 1.0f);
+	}
+	////球と平面の当たり判定		ヒットエフェクト
+	//XMVECTOR inter;
+	//bool hit = Collision::CheckSphere2Plane(sphere, plane,&inter);
+	//if (hit) {
+	//	debugText.Print("HIT", 50, 200, 1.0f);
+	//}
+	////stringstreamをリセットし,交点座標を埋め込む
+	//spherestr.str("");
+	//spherestr.clear();
+	//spherestr <<"("
+	//	<< std::fixed << std::setprecision(2)		//小数点以下2桁まで
+	//	<< inter.m128_f32[0] << ","		
+	//	<< inter.m128_f32[0] << ","		
+	//	<< inter.m128_f32[0] << ",";	
+
+	//debugText.Print(spherestr.str(), 50, 220, 1.0f);
 }
 
 void GameScene::Draw()
