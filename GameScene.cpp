@@ -33,7 +33,7 @@ void GameScene::Initialize(DirectXCommon* dxCommon, Input* input)
 	debugText.Initialize(debugTextTexNumber);
 
 	// テクスチャ読み込み
-	Sprite::LoadTexture(1, L"Resources/BackGround1280x720.png");
+	Sprite::LoadTexture(1, L"Resources/background.png");
 	//テクスチャ2番に読み込み
 	Sprite::LoadTexture(2, L"Resources/texture.png");
 
@@ -95,7 +95,7 @@ void GameScene::Update()
 	object3d->Update();
 
 	//球移動
-	{
+	
 		XMVECTOR moveY = XMVectorSet(0, 0.01f, 0, 0);
 		if (input->PushKey(DIK_NUMPAD8)) { sphere.center += moveY; }
 		else if (input->PushKey(DIK_NUMPAD2)) { sphere.center -= moveY; }
@@ -103,14 +103,14 @@ void GameScene::Update()
 		XMVECTOR moveX = XMVectorSet(0.01f, 0, 0, 0);
 		if (input->PushKey(DIK_NUMPAD6)) { sphere.center += moveX; }
 		else if (input->PushKey(DIK_NUMPAD4)) { sphere.center -= moveX; }
-	}
+	
 	//stringstreamで変数の値を埋め込んで整形する
 	std::ostringstream spherestr;
 	spherestr << "Sphere:("
 		<< std::fixed << std::setprecision(2)		//小数点以下2桁まで
 		<< sphere.center.m128_f32[0] << ","		//X
 		<< sphere.center.m128_f32[0] << ","		//Y
-		<< sphere.center.m128_f32[0] << ",";		//Z
+		<< sphere.center.m128_f32[0] << ",";	//Z
 
 	debugText.Print(spherestr.str(), 50, 180, 1.0f);
 
